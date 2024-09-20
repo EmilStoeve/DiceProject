@@ -1,10 +1,7 @@
 package opgave03;
 
-import javax.annotation.processing.SupportedSourceVersion;
-import java.sql.SQLOutput;
 import java.util.Scanner;
 import java.util.Arrays;
-import java.util.ArrayList;
 
 public class Pigs {
     // Point counter of players
@@ -29,7 +26,7 @@ public class Pigs {
         Scanner scanner = new Scanner(System.in); // scanner for user input
 
         // Information
-        greeting_users (); // Greeting the users
+        greeting_users(); // Greeting the users
         printRules(); // Printing the rules for the game
 
         // Request
@@ -54,7 +51,7 @@ public class Pigs {
     }
 
     // Method for greeting user
-    private static void greeting_users (){
+    private static void greeting_users() {
         System.out.println("=====================================================");
         System.out.println("Welcome to a game of Pigs");
     }
@@ -121,9 +118,9 @@ public class Pigs {
                     System.out.println("You currently have " + pointsPlayer1 + " points!");
 
                     // Has the player won?
-                    if(determining_win(pointsPlayer1, roundsMaxPoint)){
+                    if (determining_win(pointsPlayer1, roundsMaxPoint)) {
                         player1Round++; // Round added with one
-                        sum_player1RoundArr[player1Round] = player1_roll; // array in index of current round = sum of player
+                        sum_player1RoundArr[player1Round - 1] = player1_roll; // array in index of current round = sum of player
                         player1_roll = 0; // method invoke for resetting score for current round.
                         return;
                     }
@@ -131,8 +128,7 @@ public class Pigs {
                     // Request for prompt from user
                     System.out.println("Do you wish to roll another round? (y/n)");
                     rollDiceAnswer1 = scanner.next();
-                }
-                else { // else, player has landed on 1
+                } else { // else, player has landed on 1
                     pointsPlayer1 -= player1Sum; // player point taken from sum
                     break; // breaking the continuation
                 }
@@ -140,8 +136,8 @@ public class Pigs {
 
             // Round added with one
             player1Round++;
-            sum_player1RoundArr[player1Round - 1] = player1Sum; // array in index of current round = sum of player
-            reset_score(player1Sum); // method invoke for resetting score for current round.
+            sum_player1RoundArr[player1Round - 1] = player1_roll; // array in index of current round = sum of player
+            reset_score(player1_roll); // method invoke for resetting score for current round.
 
             //
             System.out.println("It's player 2's round!");
@@ -174,9 +170,9 @@ public class Pigs {
                     System.out.println("You currently have " + pointsPlayer2 + " points!");
 
                     // Has the player won?
-                    if(determining_win(pointsPlayer2, roundsMaxPoint)){
+                    if (determining_win(pointsPlayer2, roundsMaxPoint)) {
                         player2Round++; // Round added with one
-                        sum_player2RoundArr[player2Round] = player2_roll; // array in index of current round = sum of player
+                        sum_player2RoundArr[player2Round - 1] = player2_roll; // array in index of current round = sum of player
                         player2_roll = 0; // method invoke for resetting score for current round.
                         return;
                     }
@@ -184,16 +180,15 @@ public class Pigs {
                     // Request for prompt from user
                     System.out.println("Do you wish to roll another round? (y/n)");
                     rollDiceAnswer2 = scanner.next();
-                }
-                else { // else, player has landed on 1
+                } else { // else, player has landed on 1
                     pointsPlayer2 -= player2Sum; // player point taken from sum
                     break; // breaking the continuation
                 }
             }
 
             player2Round++; // Round added with one
-            sum_player2RoundArr[player2Round]=player2Sum; // array in index of current round = sum of player
-            reset_score(player2Sum); // method invoke for resetting score for current round.
+            sum_player2RoundArr[player2Round - 1] = player2_roll; // array in index of current round = sum of player
+            reset_score(player2_roll); // method invoke for resetting score for current round.
 
             printStatistics();
 
@@ -222,18 +217,18 @@ public class Pigs {
     }
 
     // Method for if dice rolled value of one
-    private static boolean rollDiceOne (int [] player_roll, int sum, int points){
+    private static boolean rollDiceOne(int[] player_roll, int sum, int points) {
 
         // If dice 1 or 2 is equal to 1
-        if (player_roll[0] == 1 || player_roll[1] == 1){
+        if (player_roll[0] == 1 || player_roll[1] == 1) {
             // Output to user
-            System.out.println("You unfortunable landed on 1 - no points for you this round");
+            System.out.println("You unfortunabley landed on 1 - no points for you this round");
             System.out.println("===========================================");
             sum = 0; // No points the current round
             return false; // returning false to method
         } else if (player_roll[0] == 1 && player_roll[1] == 1) { // else if both values of dice equal 1
             // output to user
-            System.out.println("You unfortunable rolled two 1's in one roll - all of your points is lost: ");
+            System.out.println("You unfortunabley rolled two 1's in one roll - all of your points is lost: ");
             System.out.println("===========================================");
             reset_score(points); // Method invoke for resetting score of player
             return false; // returning false to method
@@ -242,11 +237,11 @@ public class Pigs {
     }
 
     // Method for determining win
-    private static boolean determining_win (int playerpoint, int rounds){
-        if (pointsPlayer1 >= rounds){
+    private static boolean determining_win(int playerpoint, int rounds) {
+        if (pointsPlayer1 >= rounds) {
             System.out.println("Congratulations, Player 1 WON!");
             return true;
-        } else if (pointsPlayer2 >= rounds){
+        } else if (pointsPlayer2 >= rounds) {
             System.out.println("Congratulations, Player 2 WON!");
             return true;
         }
@@ -254,28 +249,28 @@ public class Pigs {
     }
 
     // Method for resetting player score - in case of landing 1
-    private static int reset_score(int current_player){
+    private static int reset_score(int current_player) {
         return current_player = 0;
     }
 
     // method for calculating average roll per round for each player
-    private static double average_roll_per_round(int[] player_arr, int round_value){
+    private static double average_roll_per_round(int[] player_arr, int round_value) {
         double sum = 0.0; // sum of calculation
         double result = 0.0; // result of calculation
 
-        if (round_value > 0){ // if number of rounds exceed 0 (error: divide by 0)
+        if (round_value > 0) { // if number of rounds exceed 0 (error: divide by 0)
             int length = player_arr.length; // variable for storing length of array
 
-            for(int index = 0; index < length; index++){ // iterating over each index in array
+            for (int index = 0; index < length; index++) { // iterating over each index in array
                 sum += player_arr[index]; // sum additional assignment operator to current index of player array
             }
             result = sum / round_value; // sum set to result
         }
-        return sum; // return sum to method
+        return result; // return result to method
     }
 
     // Print statistics to player (score)
-    private static void printStatistics (){
+    private static void printStatistics() {
         System.out.println("Player 1 have " + pointsPlayer1 + " points");
         System.out.println("Player 2 have " + pointsPlayer2 + " points");
     }
