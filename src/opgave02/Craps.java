@@ -17,7 +17,7 @@ public class Craps {
 
         // While loop for managing game
         while(!user_input.equals("break")){
-            playCraps();
+            playCraps(); // Game method invoke
 
             updateStatistics(); // updating rollCount
 
@@ -76,23 +76,24 @@ public class Craps {
 
     // Method for calculating sum
     public static int sum (int[] dice_array){
-        return dice_array[0] + dice_array[1];
+        return dice_array[0] + dice_array[1]; // return value of both indexes
     }
 
     // Boolean method for determining instant win
     private static boolean instant_win(int sum_of_roll){
-        if(sum_of_roll == 7 || sum_of_roll == 11){
-            return true;
+        if(sum_of_roll == 7 || sum_of_roll == 11){ // if sum equal 7 or 12
+            return true; // return true
         }
-        return false;
+        return false; // otherwise return false
     }
 
     // Boolean method for determining instant loss
     private static boolean instant_loss(int sum_of_roll){
+        // Selection: if sum not equal 2,3,12
         if (sum_of_roll == 2 || sum_of_roll == 3 || sum_of_roll ==  12){
-            return true;
+            return true; // return true
         }
-        return false;
+        return false; // otherwise return false
     }
 
     // Method for Rolling dice
@@ -107,7 +108,7 @@ public class Craps {
             dice_arr[index] = dice_value; // Index of outer_index is set to value of dice_1
         }
 
-        return dice_arr;
+        return dice_arr; // return array to method invoke
     }
 
     public static boolean rollforPoint(int point){
@@ -116,7 +117,7 @@ public class Craps {
         while(new_sum != 7 || new_sum != point){ // While point not equal to 7 or equal to point ...
             return true; // ... the point is given
         }
-        return false;
+        return false; // return false if not point not given
     }
 
     // Method for printing game statistics

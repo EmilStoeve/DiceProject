@@ -4,26 +4,52 @@ import javax.annotation.processing.SupportedSourceVersion;
 import java.sql.SQLOutput;
 import java.util.Scanner;
 import java.util.Arrays;
+import java.util.ArrayList;
 
 public class Pigs {
-    public static int pointsPlayer1 = 0;
-    public static int pointsPlayer2 = 0;
+    // Point counter of players
+    public static int pointsPlayer1 = 0; // Global variable for player 1
+    public static int pointsPlayer2 = 0; // Global varibale for player 2
 
+    // Value of total rolls (for each player)
+    public static int player1_roll = 0;
+    public static int player2_roll = 0;
+
+    // Value of rounds
+    public static int player1Round = 0;
+    public static int player2Round = 0;
+
+    // Array of sum of value per round - exstra task
+    // Incomplete
+    public static int[] sum_player1RoundArr = new int[1000];
+    public static int[] sum_player2RoundArr = new int[1000];
+
+    // Main method of the program
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        greeting_users ();
-        printRules();
-        System.out.println("Ønsker du at starte spillet? (y/n)");
-        String startGameAnswer = scanner.next();
-        while (startGameAnswer.equals("y")) {
+        Scanner scanner = new Scanner(System.in); // scanner for user input
 
-            playPigs();
+        // Information
+        greeting_users (); // Greeting the users
+        printRules(); // Printing the rules for the game
 
+        // Request
+        System.out.println("Would you like to play a game of Pigs? (y/n)");
+        String startGameAnswer = scanner.next(); // User input (scanner) stored in variable
 
-            System.out.println("Ønsker du at prøve igen?");
+        // While loop for user promt yes to wanting to play the game
+        while (startGameAnswer.equals("y")) { // player input equals to string value
+
+            playPigs(); // Method invoke containing the game
+            endGameStatistics(); // Method invoke - incomplete
+
+            System.out.println("Do you wish to proceed?"); // Output to user...
+
+            //... Requesting respons from user
             startGameAnswer = scanner.next();
-            pointsPlayer1=0;
-            pointsPlayer2=0;
+
+            // Score counter
+            pointsPlayer1 = 0; // Player_1 score counter
+            pointsPlayer2 = 0; // Player_2 score counter
         }
     }
 
@@ -47,155 +73,222 @@ public class Pigs {
         System.out.println("=====================================================");
     }
 
-// Her er metoden til selve spillet
+    // Method for the game
     private static void playPigs() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Hvor mange point ønsker du at spillet til?");
-        int roundsMaxPoint = maxPoints();
-        System.out.println("I er to spillere. Spiller 1 starter!");
+        Scanner scanner = new Scanner(System.in); // Scanner for user input
+
+        // Request user to input max points of the game
+        System.out.println("How many points do you wish to play to?");
+        final int roundsMaxPoint = maxPoints(); // Final varibale - never changes throughout the game
+
+        // Output to user - informs the user of the beginning of the game
+        System.out.println("The game consists of two players. Player 1 starts!");
         System.out.println("===========================================");
+
+        // While loop for iterating over points of players in comparison to variable roundsMaxPoint
         while (pointsPlayer1 < roundsMaxPoint || pointsPlayer2 < roundsMaxPoint) {
 
-            System.out.println("Vil spiller 1 kaste terningen? (y/n)");
+            // Request feedback from user - want to roll the dice
+            System.out.println("Would player 1 want to roll the dice? (y/n)");
             String rollDiceAnswer1 = scanner.next();
 
+            // Counting player points in sum
             int player1Sum = 0;
             int player2Sum = 0;
 
+            // Player 1 while loop
+            while (rollDiceAnswer1.equals("y")) { // While player 1 wants to play
 
-            // Spiller 1 while loop
+                // Number of rolls players has accounted for
+                player1_roll++;
 
-            while (rollDiceAnswer1.equals("y")) {
+                int[] player1Roll = rollDice(); // Value of current dice roll
 
-                int[] player1Roll = rollDice();
-
-                System.out.println("Du slog: " + Arrays.toString(player1Roll));
+                // Informing user of value
+                System.out.println("You rolled: " + Arrays.toString(player1Roll));
                 System.out.println("===========================================");
 
-                if (player1Roll[0]==1 || player1Roll[1]==1 ){
-                    System.out.println("Du slog desværre 1 så ingen point til dig denne runde");
-                    System.out.println("===========================================");
-                    pointsPlayer1-=player1Sum;
-                    player1Sum=0;
-                    break;
-                }
-                if (player1Roll[0]==1 && player1Roll[1]==1){
-                    System.out.println("Du slog desværre 2 1ere så du mister alle dine point :(");
-                    System.out.println("===========================================");
-                    player1Sum=0;
-                    pointsPlayer1=0;
-                    break;
-                }
+                // Selection: if players does not land value 1
+                if (rollDiceOne(player1Roll, player1Sum, pointsPlayer1)) {
 
-                for (int i = 0; i < player1Roll.length; i++) {
-                    player1Sum += player1Roll[i];
-                    pointsPlayer1 += player1Roll[i];
+                    // Iteration: index in player role array
+                    for (int i = 0; i < player1Roll.length; i++) {
+                        pointsPlayer1 += player1Roll[i];
+                        player1Sum += player1Roll[i];
+                    }
+
+                    // Output to user - number of points at current point
+                    System.out.println("You currently have " + pointsPlayer1 + " points!");
+
+                    // Has the player won?
+                    if(determining_win(pointsPlayer1, roundsMaxPoint)){
+                        player1Round++; // Round added with one
+                        sum_player1RoundArr[player1Round] = player1_roll; // array in index of current round = sum of player
+                        player1_roll = 0; // method invoke for resetting score for current round.
+                        return;
+                    }
+
+                    // Request for prompt from user
+                    System.out.println("Do you wish to roll another round? (y/n)");
+                    rollDiceAnswer1 = scanner.next();
                 }
-
-                System.out.println("Du har nu " + pointsPlayer1 + "point!");
-
-                if (pointsPlayer1>=roundsMaxPoint){
-                    System.out.println("Spiller 1 vandt! Tillykke!!!!");
-                    return;
+                else { // else, player has landed on 1
+                    pointsPlayer1 -= player1Sum; // player point taken from sum
+                    break; // breaking the continuation
                 }
-
-                System.out.println("Ønsker du at slå igen? (y/n)");
-                rollDiceAnswer1 = scanner.next();
             }
 
+            // Round added with one
+            player1Round++;
+            sum_player1RoundArr[player1Round - 1] = player1Sum; // array in index of current round = sum of player
+            reset_score(player1Sum); // method invoke for resetting score for current round.
 
-
-            System.out.println("Nu er det spiller 2s tur!");
+            //
+            System.out.println("It's player 2's round!");
             System.out.println("===========================================");
-            System.out.println("Vil spiller 2 kaste terningen?");
+            System.out.println("Would player 2 want to roll the dice?");
             String rollDiceAnswer2 = scanner.next();
 
             // Spiller 2 while loop
 
             while (rollDiceAnswer2.equals("y")) {
 
+                // Number of rolls players has accounted for
+                player2_roll++;
+
                 int[] player2Roll = rollDice();
 
-                System.out.println("Du slog: " + Arrays.toString(player2Roll));
+                System.out.println("You rolled: " + Arrays.toString(player2Roll));
                 System.out.println("===========================================");
 
-                if (player2Roll[0]==1 || player2Roll[1]==1){
-                    System.out.println("Du slog desværre 1 så ingen point til dig denne runde");
-                    System.out.println("===========================================");
-                    pointsPlayer2-=player2Sum;
-                    player2Sum=0;
-                    break;
-                }
-                if (player2Roll[0]==1 && player2Roll[1]==1){
-                    System.out.println("Du slog desværre 2 1ere så du mister alle dine point :(");
-                    System.out.println("===========================================");
-                    player2Sum=0;
-                    pointsPlayer2=0;
-                    break;
-                }
+                // Selection: if players does not land value 1
+                if (rollDiceOne(player2Roll, player2Sum, pointsPlayer2)) {
 
-                for (int i = 0; i < player2Roll.length; i++) {
-                    player2Sum += player2Roll[i];
-                    pointsPlayer2 += player2Roll[i];
+                    // Iteration: index in player role array
+                    for (int i = 0; i < player2Roll.length; i++) {
+                        pointsPlayer2 += player2Roll[i];
+                        player2Sum += player2Roll[i];
+                    }
+
+                    // Output to user - number of points at current point
+                    System.out.println("You currently have " + pointsPlayer2 + " points!");
+
+                    // Has the player won?
+                    if(determining_win(pointsPlayer2, roundsMaxPoint)){
+                        player2Round++; // Round added with one
+                        sum_player2RoundArr[player2Round] = player2_roll; // array in index of current round = sum of player
+                        player2_roll = 0; // method invoke for resetting score for current round.
+                        return;
+                    }
+
+                    // Request for prompt from user
+                    System.out.println("Do you wish to roll another round? (y/n)");
+                    rollDiceAnswer2 = scanner.next();
                 }
-
-                System.out.println("Du har nu " + pointsPlayer2 + "point!");
-
-                if (pointsPlayer2>=roundsMaxPoint){
-                    System.out.println("Spiller 2 vandt! Tillykke!!!!");
-                    return;
+                else { // else, player has landed on 1
+                    pointsPlayer2 -= player2Sum; // player point taken from sum
+                    break; // breaking the continuation
                 }
-
-                System.out.println("Ønsker du at slå igen? (y/n)");
-                rollDiceAnswer2 = scanner.next();
             }
 
-
-//            /*-ERROR- Hvis begge spillere trykker nej lige meget om de har  -ERROR-
-//              -ERROR- slået med terningen eller ej så går den ud af spillet -ERROR- */
-//            if (rollDiceAnswer1.equals("n") && rollDiceAnswer2.equals("n")){
-//                System.out.println("Okay fint så lad værd");
-//                return;
-//            }
-
+            player2Round++; // Round added with one
+            sum_player2RoundArr[player2Round]=player2Sum; // array in index of current round = sum of player
+            reset_score(player2Sum); // method invoke for resetting score for current round.
 
             printStatistics();
 
             System.out.println("===========================================");
-            System.out.println("Nu er det spiller 1 igen!");
+            System.out.println("It's now Player 1's turn");
             System.out.println("===========================================");
-
         }
-
-
-
     }
 
-// Her er "RollDice" metoden som står for selve terningerne
-
+    // Method for determining value of dices rolled
     private static int[] rollDice() {
-
-// Ønsker man at spille med en eller to terninger kan man rette array længden på "diceArr"
-
-        int[] diceArr = new int[2];
-        int arrayLength = diceArr.length;
-        for (int i = 0; i < arrayLength; i++) {
-            int diceValue = (int) (Math.random() * 6 + 1);
-            diceArr[i] = diceValue;
+        int[] diceArr = new int[2]; // Array with two index
+        int arrayLength = diceArr.length; // length of array
+        for (int i = 0; i < arrayLength; i++) { // Iteration over index in array
+            int diceValue = (int) (Math.random() * 6 + 1); // dice value - random number (using math method) 1 to 6
+            diceArr[i] = diceValue; // array value in index i is equal to value of diceValue
         }
-
-        return diceArr;
+        return diceArr; // Returning variable to method invoke
     }
 
+    // Method for max points of the game
     private static int maxPoints() {
-        Scanner scanner = new Scanner(System.in);
-        int numberOfRounds = scanner.nextInt();
-
-        return numberOfRounds;
+        Scanner scanner = new Scanner(System.in); // New scanner
+        int numberOfRounds = scanner.nextInt(); // no of rounds equal to user input
+        return numberOfRounds; // Returning value of rounds to method invoke
     }
 
+    // Method for if dice rolled value of one
+    private static boolean rollDiceOne (int [] player_roll, int sum, int points){
+
+        // If dice 1 or 2 is equal to 1
+        if (player_roll[0] == 1 || player_roll[1] == 1){
+            // Output to user
+            System.out.println("You unfortunable landed on 1 - no points for you this round");
+            System.out.println("===========================================");
+            sum = 0; // No points the current round
+            return false; // returning false to method
+        } else if (player_roll[0] == 1 && player_roll[1] == 1) { // else if both values of dice equal 1
+            // output to user
+            System.out.println("You unfortunable rolled two 1's in one roll - all of your points is lost: ");
+            System.out.println("===========================================");
+            reset_score(points); // Method invoke for resetting score of player
+            return false; // returning false to method
+        }
+        return true; // return true to method if non of selection occured
+    }
+
+    // Method for determining win
+    private static boolean determining_win (int playerpoint, int rounds){
+        if (pointsPlayer1 >= rounds){
+            System.out.println("Congratulations, Player 1 WON!");
+            return true;
+        } else if (pointsPlayer2 >= rounds){
+            System.out.println("Congratulations, Player 2 WON!");
+            return true;
+        }
+        return false;
+    }
+
+    // Method for resetting player score - in case of landing 1
+    private static int reset_score(int current_player){
+        return current_player = 0;
+    }
+
+    // method for calculating average roll per round for each player
+    private static double average_roll_per_round(int[] player_arr, int round_value){
+        double sum = 0.0; // sum of calculation
+        double result = 0.0; // result of calculation
+
+        if (round_value > 0){ // if number of rounds exceed 0 (error: divide by 0)
+            int length = player_arr.length; // variable for storing length of array
+
+            for(int index = 0; index < length; index++){ // iterating over each index in array
+                sum += player_arr[index]; // sum additional assignment operator to current index of player array
+            }
+            result = sum / round_value; // sum set to result
+        }
+        return sum; // return sum to method
+    }
+
+    // Print statistics to player (score)
     private static void printStatistics (){
-        System.out.println("Spiller 1 har " + pointsPlayer1 + "Point");
-        System.out.println("Spiller 2 har " + pointsPlayer2 + "Point");
+        System.out.println("Player 1 have " + pointsPlayer1 + " points");
+        System.out.println("Player 2 have " + pointsPlayer2 + " points");
+    }
+
+    // Method to present end game statistics to players
+    // Incomplete
+    private static void endGameStatistics() {
+        // average roll for player 1
+        System.out.print("Player 1's average roll per round: ");
+        System.out.println(average_roll_per_round(sum_player1RoundArr, player1Round)); // Method invoke
+
+        // average roll for player 2
+        System.out.print("Player 2's average roll per round: ");
+        System.out.println(average_roll_per_round(sum_player2RoundArr, player2Round)); // Method invoke
     }
 }
